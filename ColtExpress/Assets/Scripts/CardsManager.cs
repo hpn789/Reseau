@@ -20,7 +20,20 @@ public class CardsManager : MonoBehaviour
     [SerializeField]
     Image _lastCard;
 
-    private int[] _cardIds;
+    private int[] _cardIds = new int[6];
+
+    void Start()
+    {
+        _cardList.StartCards();
+        int[] cards = new int[6];
+        cards[0] = 111;
+        cards[1] = 112;
+        cards[2] = 111;
+        cards[3] = 115;
+        cards[4] = 114;
+        cards[5] = 116;
+        ShowDrawnCards(cards);
+    }
 
     public void ShowDrawnCards(int[] cardIds)
     {

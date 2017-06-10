@@ -11,9 +11,9 @@ public class Cards : MonoBehaviour
     [SerializeField]
     int[] _cardIds;
 
-    private Dictionary<int, Sprite> _cards;
+    private Dictionary<int, Sprite> _cards = new Dictionary<int, Sprite>();
 
-    void Start()
+    public void StartCards()
     {
         for(int i = 0; i < _cardIds.Length; i++)
         {
