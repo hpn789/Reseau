@@ -9,6 +9,9 @@ using UnityEngine.UI;
 public class CardsManager : MonoBehaviour
 {
     [SerializeField]
+    ConnectToServer _connectionManager;
+
+    [SerializeField]
     Cards _cardList;
 
     [SerializeField]
@@ -21,6 +24,7 @@ public class CardsManager : MonoBehaviour
     Image _lastCard;
 
     private int[] _cardIds = new int[6];
+    private bool _playable = false;
 
     void Start()
     {
@@ -33,6 +37,11 @@ public class CardsManager : MonoBehaviour
         cards[4] = 114;
         cards[5] = 116;
         ShowDrawnCards(cards);
+    }
+
+    public void BeginTurn()
+    {
+        _playable = true;
     }
 
     public void ShowDrawnCards(int[] cardIds)
@@ -52,7 +61,13 @@ public class CardsManager : MonoBehaviour
 
     public void PlayCard(int card)
     {
-        _cards[card].SetActive(false);
-        ShowLastPlayed(_cardIds[card]);
+        if(_playable)
+        {
+            _cards[card].SetActive(false);
+            ShowLastPlayed(_cardIds[card]);
+            _playable = false;
+            string socket = "";
+            _connectionManager.WriteSocket(socket);
+        }
     }
 }
