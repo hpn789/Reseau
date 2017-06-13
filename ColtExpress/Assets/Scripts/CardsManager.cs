@@ -23,12 +23,12 @@ public class CardsManager : MonoBehaviour
     [SerializeField]
     Image _lastCard;
 
-    private int[] _cardIds = new int[6];
+    private int[] _cardIds = new int[9];
     private bool _playable = false;
 
     void Start()
     {
-        _cardList.StartCards();
+        /*_cardList.StartCards();
         int[] cards = new int[6];
         cards[0] = 111;
         cards[1] = 112;
@@ -36,7 +36,7 @@ public class CardsManager : MonoBehaviour
         cards[3] = 115;
         cards[4] = 114;
         cards[5] = 116;
-        ShowDrawnCards(cards);
+        ShowDrawnCards(cards);*/
     }
 
     public void BeginTurn()
@@ -44,18 +44,31 @@ public class CardsManager : MonoBehaviour
         _playable = true;
     }
 
-    public void ShowDrawnCards(int[] cardIds)
+    public void ShowDrawnCards(string[] cardIds)
     {
-        for(int i = 0; i < cardIds.Length; i++)
+        for(int i = 0; i < cardIds.Length && i<9; i++)
         {
+            int id = int.Parse(cardIds[i]);
+            if (id == -1)
+                continue;
             _cards[i].SetActive(true);
-            _placeHolders[i].sprite = _cardList.GetImageById(cardIds[i]);
-            _cardIds[i] = cardIds[i];
+            _placeHolders[i].sprite = _cardList.GetImageById(id);
+            _cardIds[i] = id;
         }
     }
 
-    public void ShowLastPlayed(int cardId)
+    public void HideAllCard()
     {
+        for (int i = 0; i < _cards.Length; i++)
+        {
+            _cards[i].SetActive(false);
+        }
+    }
+
+    public void ShowLastPlayed(int cardId, bool isVisible)
+    {
+        if (cardId == -1 || !isVisible)
+            cardId = 81;
         _lastCard.sprite = _cardList.GetImageById(cardId);
     }
 
@@ -64,7 +77,7 @@ public class CardsManager : MonoBehaviour
         if(_playable)
         {
             _cards[card].SetActive(false);
-            ShowLastPlayed(_cardIds[card]);
+            //ShowLastPlayed(_cardIds[card]);
             _playable = false;
             string socket = "";
             _connectionManager.WriteSocket(socket);

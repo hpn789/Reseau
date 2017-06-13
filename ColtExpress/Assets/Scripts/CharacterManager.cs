@@ -7,74 +7,68 @@ using System;
 public class CharacterManager : MonoBehaviour
 {
     [SerializeField]
-    Sprite[] _characters;
+    Train train;
 
     [SerializeField]
-    GameObject[] _placeHoldersGO;
+    Player[] players;
 
     [SerializeField]
-    Text[] _charactersTreasures;
+    CardsManager cardManager;
 
-    [SerializeField]
-    Text[] _wagonsTreasures;
-
-    Image[] _placeHoldersImg = new Image[40];
-    GameObject[] _activatedPlaces = new GameObject[5];
-    Dictionary<int, int> _placeNumber = new Dictionary<int, int>();
-
-    void Start()
+    public void updateGameState(string gameState)
     {
-        for(int i = 0; i < 10; i++)
+        char sep1 = '|';
+        char sep2 = '~';
+        char sep3 = ' ';
+
+        string[] infos = gameState.Split(sep1);
+
+        train.unactiveAllCharacter();
+        
+        //maj info joueur buton + position
+        for(int i=1;i<5 && i<infos.Length;i++)
         {
-            _placeNumber.Add(i, 0);
+            string[] infosJoueur = infos[i].Split(sep2);
+            players[i - 1].setNbBourses(infosJoueur[2]);
+            players[i - 1].setNbcase("0");
+            players[i - 1].setNbDiamonds(infosJoueur[3]);
+            players[i - 1].setNbBalles(int.Parse(infosJoueur[0]));
+            train.getPlace(int.Parse(infosJoueur[1])).activateCharacter(i - 1);
+        }
+        //maj position marshall
+        train.getPlace(int.Parse(infos[8])).activateCharacter(4);
+
+        //maj butin train
+        string[] infosTrain = infos[6].Split(sep3);
+        for(int i=0;i<infosTrain.Length;i++)
+        {
+            string[] infoWagon = infosTrain[i].Split(sep2);
+            train.getPlace(i).setNbcase("0");
+            train.getPlace(i).setNbBourses(infoWagon[0]);
+            train.getPlace(i).setNbDiamonds(infoWagon[1]);
         }
 
-        int activated = 0;
-        for(int i = 0; i < _placeHoldersGO.Length; i++)
-        {
-            _placeHoldersImg[i] = _placeHoldersGO[i].GetComponent<Image>();
-            if(_placeHoldersGO[i].activeInHierarchy)
-            {
-                _activatedPlaces[activated++] = _placeHoldersGO[i];
-            }
-        }
-    }
+        //maj place case
+        int positionCase = int.Parse(infos[7]);
+        if (positionCase < 10)
+            train.getPlace(positionCase).setNbcase("1");
+        else
+            players[positionCase - 10].setNbcase("1");
 
-    public void PlaceCharacters(Dictionary<int, int> places)
-    {
-        for(int i = 0; i < _activatedPlaces.Length; i++)
-        {
-            _activatedPlaces[i].SetActive(false);
-        }
+        //récupère infos de tour
+        int tour = int.Parse(infos[0]);
 
-        for (int i = 0; i < 10; i++)
-        {
-            _placeNumber[i] = 0;
-        }
+        //maj cartes joueur
+        string[] cards = infos[5].Split(sep2);
+        cardManager.HideAllCard();
+        cardManager.ShowDrawnCards(cards);
 
-        int activated = 0;
-        for (int i = 0; i < places.Count; i++)
-        {
-            _placeHoldersGO[4 * places[i] + _placeNumber[places[i]]].SetActive(true);
-            _activatedPlaces[activated++] = _placeHoldersGO[4 * places[i] + _placeNumber[places[i]]];
-            _placeHoldersImg[4 * places[i] + _placeNumber[places[i]]].sprite = _characters[i];
-            _placeNumber[places[i]]++;
-        }
-    }
 
-    public void GiveTreasuresToPlayers(Dictionary<int, int> treasures)
-    {
-        for(int i = 0; i < treasures.Count; i++)
-        {
-            _charactersTreasures[i].text = treasures[i].ToString();
-        }
-    }
+        //maj dernière carte pile
+        string[] infosPile = infos[9].Split(sep2);
+        int lastCard = int.Parse(infosPile[0]);
+        bool isCardVisible = int.Parse(infosPile[1]) == 1 ? true : false;
 
-    public void PlaceTreasuresInWagons(Dictionary<int, int> treasures)
-    {
-        for (int i = 0; i < treasures.Count; i++)
-        {
-            _wagonsTreasures[i].text = treasures[i].ToString();
-        }
-    }
+        cardManager.ShowLastPlayed(lastCard, isCardVisible);
+    } 
 }

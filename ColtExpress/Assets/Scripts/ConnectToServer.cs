@@ -13,7 +13,11 @@ public class ConnectToServer : MonoBehaviour
 
     [SerializeField]
     int port = 1337;
-    
+
+    [SerializeField]
+    CharacterManager characterManager;
+
+
     bool _socketReady = false;
     TcpClient _socket;
     NetworkStream _stream;
@@ -27,7 +31,7 @@ public class ConnectToServer : MonoBehaviour
             _socket = new TcpClient(IP, port);
             _stream = _socket.GetStream();
             _writer = new StreamWriter(_stream);
-            _reader = new StreamReader(_stream);
+            _reader = new StreamReader(_stream, System.Text.Encoding.UTF8, true);
             _socketReady = true;
             _stream.ReadTimeout = 1;
         }
@@ -45,7 +49,9 @@ public class ConnectToServer : MonoBehaviour
         }
         try
         {
-            Debug.Log(_reader.ReadLine());
+            string line = _reader.ReadLine();
+            Debug.Log(line);
+            characterManager.updateGameState(line);
         }
         catch (Exception e)
         {
