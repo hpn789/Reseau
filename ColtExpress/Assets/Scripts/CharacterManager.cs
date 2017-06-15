@@ -13,7 +13,25 @@ public class CharacterManager : MonoBehaviour
     Player[] players;
 
     [SerializeField]
+    Image[] playerPortrait;
+
+    [SerializeField]
+    Sprite[] characterPortrait;
+
+    [SerializeField]
     CardsManager cardManager;
+
+    [SerializeField]
+    GameObject waitingPlayers;
+
+    [SerializeField]
+    GameObject scoreCanvas;
+
+    [SerializeField]
+    Text[] scores;
+
+    [SerializeField]
+    GameObject[] choices;
 
     public void updateGameState(string gameState)
     {
@@ -35,6 +53,7 @@ public class CharacterManager : MonoBehaviour
             players[i - 1].setNbBalles(int.Parse(infosJoueur[0]));
             train.getPlace(int.Parse(infosJoueur[1])).activateCharacter(i - 1);
         }
+
         //maj position marshall
         train.getPlace(int.Parse(infos[8])).activateCharacter(4);
 
@@ -63,6 +82,37 @@ public class CharacterManager : MonoBehaviour
         cardManager.HideAllCard();
         cardManager.ShowDrawnCards(cards);
 
+        //maj état du jeu
+        int state = int.Parse(infos[10]);
+        switch(state)
+        {
+            case 0:
+                string[] charac = infos[11].Split(sep3);
+                for (int i = 0; i < 4; i++)
+                {
+                    playerPortrait[i].sprite = characterPortrait[int.Parse(charac[i])];
+                }
+                waitingPlayers.SetActive(true);
+                break;
+            case 3:
+                for (int i = 0; i < choices.Length; i++)
+                {
+                    choices[i].SetActive(true);
+                }
+                break;
+            case 4:
+                string[] playerScores = infos[11].Split(sep3);
+                for (int i = 0; i < 4; i++)
+                {
+                    scores[i].text = playerScores[i].ToString();
+                }
+                scoreCanvas.SetActive(true);
+                break;
+            default:
+                if (waitingPlayers.activeSelf)
+                    waitingPlayers.SetActive(false);
+                break;
+        }
 
         //maj dernière carte pile
         string[] infosPile = infos[9].Split(sep2);

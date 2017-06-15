@@ -23,6 +23,9 @@ public class CardsManager : MonoBehaviour
     [SerializeField]
     Image _lastCard;
 
+    [SerializeField]
+    GameObject[] _choices;
+
     private int[] _cardIds = new int[9];
     private bool _playable = false;
 
@@ -54,6 +57,7 @@ public class CardsManager : MonoBehaviour
             _cards[i].SetActive(true);
             _placeHolders[i].sprite = _cardList.GetImageById(id);
             _cardIds[i] = id;
+            _cards[i].GetComponent<Button>().onClick.AddListener(delegate { PlayCard(id); });
         }
     }
 
@@ -79,8 +83,28 @@ public class CardsManager : MonoBehaviour
             _cards[card].SetActive(false);
             //ShowLastPlayed(_cardIds[card]);
             _playable = false;
-            string socket = "";
+            string socket = "0 " + card;
             _connectionManager.WriteSocket(socket);
         }
+    }
+
+    public void ChooseRight()
+    {
+        for(int i = 0; i < _choices.Length; i++)
+        {
+            _choices[i].SetActive(false);
+        }
+        string socket = "2 0";
+        _connectionManager.WriteSocket(socket);
+    }
+
+    public void ChooseLeft()
+    {
+        for (int i = 0; i < _choices.Length; i++)
+        {
+            _choices[i].SetActive(false);
+        }
+        string socket = "2 1";
+        _connectionManager.WriteSocket(socket);
     }
 }
